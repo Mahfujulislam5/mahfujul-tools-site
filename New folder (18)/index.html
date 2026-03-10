@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahfujul Islam - Digital Problem Solver & Experimental Web Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --cyan: #00ffff;
+            --dark-bg: #0a0a0a;
+            --glow-color: rgba(0, 255, 255, 0.7);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--dark-bg);
+            color: #e0e0e0;
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        /* Custom Cursor */
+        .cursor {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--cyan);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+        }
+
+        .cursor.hovered {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 255, 255, 0.1);
+        }
+        
+        #spotlight {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease-out;
+        }
+
+
+        .glass-blur {
+            background: rgba(17, 24, 39, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glowing-border:hover {
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .soft-glow:hover {
+            text-shadow: 0 0 10px var(--glow-color);
+            color: var(--cyan);
+        }
+        
+        .animated-gradient-btn {
+            background-size: 200% 200%;
+            background-image: linear-gradient(45deg, var(--cyan), #2dd4bf, var(--cyan));
+            animation: gradient-animation 4s ease infinite;
+        }
+        
+        .animated-gradient-border {
+             border: 2px solid;
+             border-image-slice: 1;
+             border-width: 2px;
+             border-image-source: linear-gradient(45deg, var(--cyan), #a855f7);
+        }
+        .animated-gradient-border:hover {
+             border-image-source: linear-gradient(45deg, #a855f7, var(--cyan));
+             box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Scroll Animation */
+        .section-hidden {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .section-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="tech-background-container" class="fixed top-0 left-0 w-full h-full z-[-2]">
+        <canvas id="tech-background"></canvas>
+    </div>
+    <div id="spotlight"></div>
+    <div class="cursor"></div>
+
+    <!-- NAVIGATION BAR -->
+    <nav id="navbar" class="fixed w-full top-0 left-0 z-50 p-4 glass-blur transition-all duration-300">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="text-xl font-bold tracking-wider interactive-element">MAHFUJUL ISLAM</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="soft-glow interactive-element">Home</a>
+                <a href="#tools" class="soft-glow interactive-element">Tools</a>
+                <a href="#projects" class="soft-glow interactive-element">Projects</a>
+                <a href="#learning" class="soft-glow interactive-element">Learning</a>
+                <a href="#contact" class="soft-glow interactive-element">Contact</a>
+            </div>
+            <div class="md:hidden">
+                <button id="hamburger-btn" class="text-white focus:outline-none interactive-element">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden mt-4">
+            <a href="#home" class="block py-2 px-4 text-sm soft-glow">Home</a>
+            <a href="#tools" class="block py-2 px-4 text-sm soft-glow">Tools</a>
+            <a href="#projects" class="block py-2 px-4 text-sm soft-glow">Projects</a>
+            <a href="#learning" class="block py-2 px-4 text-sm soft-glow">Learning</a>
+            <a href="#contact" class="block py-2 px-4 text-sm soft-glow">Contact</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section id="home" class="min-h-screen flex items-center">
+        <div id="hero-content" class="container mx-auto px-4 grid md:grid-cols-2 gap-8 items-center">
+            <div class="text-center md:text-left parallax-element" data-speed="2">
+                <h1 class="text-5xl md:text-7xl font-bold mb-4" style="text-shadow: 0 0 15px var(--glow-color);">Mahfujul Islam</h1>
+                <p class="text-xl md:text-2xl text-cyan-300 mb-6">Digital Problem Solver & Experimental Web Creator</p>
+                <p class="mb-8 text-gray-400">
+                    I believe the best way to learn is by doing. This digital laboratory is a collection of tools and experiments born from a curiosity to understand how technology works, one line of code at a time.
+                </p>
+                <div class="flex justify-center md:justify-start space-x-4">
+                    <a href="#tools" class="animated-gradient-btn text-black font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 interactive-element">Explore Tools</a>
+                    <a href="#projects" class="animated-gradient-border text-cyan-300 font-bold py-3 px-6 rounded-lg transition-all hover:text-white interactive-element">View Projects</a>
+                </div>
+            </div>
+            <div class="flex justify-center parallax-element" data-speed="-2">
+                <div class="relative w-64 h-64 md:w-80 md:h-80 profile-image-container">
+                    <img id="profile-img-1" src="https://i.ibb.co.com/hFmKLJ5c/freepik-raju-a-confident-south-asian-man-with-wheattoned-s-12632.png" alt="Mahfujul Islam" class="rounded-full w-full h-full object-cover shadow-2xl shadow-cyan-500/20">
+                    <div id="fallback-sphere-1" class="hidden"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about" class="py-20 section-hidden">
+        <div class="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+            <div class="flex justify-center">
+                <div class="relative w-64 h-64 md:w-80 md:h-80">
+                    <img id="profile-img-2" src="https://i.ibb.co/nMXY2RPN/freepik-raju-a-confident-young-man-standing-in-front-J-of-a-72620.png" alt="Mahfujul Islam" class="rounded-lg w-full h-full object-cover glowing-border">
+                     <div id="fallback-sphere-2" class="hidden"></div>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold mb-4">A Mindset of Creation</h2>
+                <p class="text-gray-400 leading-relaxed">
+                    For me, coding is more than just a profession; it's a vehicle for exploration. I build tools not just to solve problems, but to deconstruct them, understand their components, and in the process, deepen my own knowledge. Every project is an experiment, every challenge an opportunity to learn something new. This website is a testament to that philosophy – a living portfolio of curiosity-driven development.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FEATURED TOOLS SECTION -->
+    <section id="tools" class="py-20 bg-black bg-opacity-20 section-hidden">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Tools I Built While Learning</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Tool Cards -->
+                 <div class="glass-blur rounded-lg p-6 glowing-border transform hover:-translate-y-2 transition-transform duration-300 interactive-element">
+                    <h3 class="font-bold text-xl mb-2 text-cyan-300">AI Prompt Generator</h3>
+                    <p class="text-gray-400 text-sm">A simple tool to generate creative prompts for AI image and text models.</p>
+                </div>
+                <div class="glass-blur rounded-lg p-6 glowing-border transform hover:-translate-y-2 transition-transform duration-300 interactive-element">
+                    <h3 class="font-bold text-xl mb-2 text-cyan-300">CSS Gradient Generator</h3>
+                    <p class="text-gray-400 text-sm">Visually create and customize complex CSS gradients for web design.</p>
+                </div>
+                <div class="glass-blur rounded-lg p-6 glowing-border transform hover:-translate-y-2 transition-transform duration-300 interactive-element">
+                    <h3 class="font-bold text-xl mb-2 text-cyan-300">Code Snippet Manager</h3>
+                    <p class="text-gray-400 text-sm">Organize and quickly access frequently used code snippets.</p>
+                </div>
+                <div class="glass-blur rounded-lg p-6 glowing-border transform hover:-translate-y-2 transition-transform duration-300 interactive-element">
+                    <h3 class="font-bold text-xl mb-2 text-cyan-300">Responsive Tester</h3>
+                    <p class="text-gray-400 text-sm">Test responsiveness across multiple device screen sizes simultaneously.</p>
+                </div>
+                 <div class="glass-blur rounded-lg p-6 glowing-border transform hover:-translate-y-2 transition-transform duration-300 interactive-element">
+                    <h3 class="font-bold text-xl mb-2 text-cyan-300">Color Contrast Checker</h3>
+                    <p class="text-gray-400 text-sm">Ensure accessibility by checking text and background color contrast ratios.</p>
+                </div>
+                <div class="glass-blur rounded-lg p-6 glowing-border transform hover:-translate-y-2 transition-transform duration-300 interactive-element">
+                    <h3 class="font-bold text-xl mb-2 text-cyan-300">SVG Path Visualizer</h3>
+                    <p class="text-gray-400 text-sm">Visualize and edit SVG paths in real-time to create complex shapes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TOOLS DIRECTORY SECTION -->
+    <section id="projects" class="py-20 section-hidden">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-6">Tools Directory</h2>
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <input type="text" id="tool-search" placeholder="Search tools..." class="w-full md:w-1/2 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 interactive-element">
+            </div>
+            <div id="tools-grid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Tool items will be injected here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- LEARNING JOURNEY SECTION -->
+    <section id="learning" class="py-20 bg-black bg-opacity-20 section-hidden">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">What I'm Exploring</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-blur rounded-lg p-6 text-center glowing-border">
+                    <h3 class="text-xl font-bold text-cyan-300 mb-3">Creative Coding</h3>
+                    <p class="text-gray-400">Diving into generative art and interactive animations with canvas and WebGL to blend code with creativity.</p>
+                </div>
+                <div class="glass-blur rounded-lg p-6 text-center glowing-border">
+                    <h3 class="text-xl font-bold text-cyan-300 mb-3">AI Experimentation</h3>
+                    <p class="text-gray-400">Exploring large language models and diffusion models to build intelligent and creative web applications.</p>
+                </div>
+                <div class="glass-blur rounded-lg p-6 text-center glowing-border">
+                    <h3 class="text-xl font-bold text-cyan-300 mb-3">Automation</h3>
+                    <p class="text-gray-400">Building scripts and tools to automate repetitive tasks, improving workflow and efficiency in development.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="py-20 section-hidden">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Let's Connect</h2>
+            <p class="max-w-2xl mx-auto text-gray-400 mb-8">
+                Have a project in mind, an idea to discuss, or just want to talk about technology? I'm always open to new conversations and collaborations.
+            </p>
+            <div class="flex justify-center space-x-4">
+                <a href="mailto:mahfujul.islam@example.com" class="animated-gradient-btn text-black font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 interactive-element">Email Me</a>
+                <a href="https://github.com/mahfujulislam" target="_blank" class="animated-gradient-border text-cyan-300 font-bold py-3 px-6 rounded-lg transition-all hover:text-white interactive-element">View GitHub</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-8">
+        <div class="container mx-auto text-center text-sm text-gray-500">
+            <p>&copy; 2026 Mahfujul Islam. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- ADVANCED CURSOR AND MOUSE TRACKING ---
+            const cursor = document.querySelector('.cursor');
+            const spotlight = document.getElementById('spotlight');
+            const interactiveElements = document.querySelectorAll('.interactive-element');
+
+            window.addEventListener('mousemove', e => {
+                const { clientX: x, clientY: y } = e;
+                cursor.style.left = `${x}px`;
+                cursor.style.top = `${y}px`;
+                spotlight.style.transform = `translate(${x - 200}px, ${y - 200}px)`;
+                
+                // Parallax effect
+                const parallaxElements = document.querySelectorAll('.parallax-element');
+                parallaxElements.forEach(el => {
+                    const speed = el.dataset.speed;
+                    const elX = (window.innerWidth - x * speed) / 100;
+                    const elY = (window.innerHeight - y * speed) / 100;
+                    el.style.transform = `translateX(${elX}px) translateY(${elY}px)`;
+                });
+            });
+
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+            });
+
+
+            // --- BACKGROUND CANVAS ANIMATION ---
+            const canvas = document.getElementById('tech-background');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            const mouse = { x: null, y: null };
+            
+            window.addEventListener('mousemove', e => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            });
+            window.addEventListener('mouseout', () => {
+                mouse.x = null;
+                mouse.y = null;
+            });
+
+
+            class Particle {
+                constructor(x, y) {
+                    this.x = x || Math.random() * canvas.width;
+                    this.y = y || Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 1;
+                    this.speedX = Math.random() * 1 - 0.5;
+                    this.speedY = Math.random() * 1 - 0.5;
+                    this.color = 'rgba(0, 255, 255, 0.5)';
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+
+                    if (this.size > 0.2) this.size -= 0.01;
+                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            function initParticles() {
+                particles = [];
+                const particleCount = (canvas.width * canvas.height) / 10000;
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                connectParticles();
+                requestAnimationFrame(animate);
+            }
+
+            function connectParticles() {
+                let opacityValue = 1;
+                for (let a = 0; a < particles.length; a++) {
+                    for (let b = a; b < particles.length; b++) {
+                        let distance = ((particles[a].x - particles[b].x) * (particles[a].x - particles[b].x)) +
+                                     ((particles[a].y - particles[b].y) * (particles[a].y - particles[b].y));
+
+                        if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                            opacityValue = 1 - (distance / 20000);
+                            ctx.strokeStyle = `rgba(0, 255, 255, ${opacityValue * 0.1})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[a].x, particles[a].y);
+                            ctx.lineTo(particles[b].x, particles[b].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                initParticles();
+            });
+
+            initParticles();
+            animate();
+
+            // --- SCROLL ANIMATIONS ---
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('section-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.section-hidden').forEach((el) => {
+                observer.observe(el);
+            });
+
+
+            // --- RESPONSIVE NAVIGATION ---
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            hamburgerBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            mobileMenu.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+
+
+            // --- TOOLS DIRECTORY ---
+            const toolsData = [
+                { title: 'AI Prompt Generator', category: 'ai', description: 'Generate creative prompts for AI models.' },
+                { title: 'CSS Gradient Generator', category: 'generators', description: 'Visually create complex CSS gradients.' },
+                { title: 'Code Snippet Manager', category: 'developer', description: 'Organize and access code snippets.' },
+                { title: 'Responsive Tester', category: 'developer', description: 'Test layouts on multiple screen sizes.' },
+            ];
+
+            const toolsGrid = document.getElementById('tools-grid');
+            const searchInput = document.getElementById('tool-search');
+
+            const displayTools = (filteredTools) => {
+                toolsGrid.innerHTML = '';
+                filteredTools.forEach(tool => {
+                    const toolCard = document.createElement('div');
+                    toolCard.className = 'glass-blur rounded-lg p-4 glowing-border transform hover:-translate-y-1 transition-all duration-300 interactive-element';
+                    toolCard.innerHTML = `
+                        <h3 class="font-bold text-lg mb-2 text-cyan-300">${tool.title}</h3>
+                        <p class="text-gray-400 text-sm">${tool.description}</p>
+                    `;
+                    toolsGrid.appendChild(toolCard);
+                });
+                 // Re-apply hover listeners for new elements
+                document.querySelectorAll('.interactive-element').forEach(el => {
+                    el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+                    el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+                });
+            };
+
+            const filterTools = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filtered = toolsData.filter(tool => tool.title.toLowerCase().includes(searchTerm));
+                displayTools(filtered);
+            };
+
+            searchInput.addEventListener('keyup', filterTools);
+            displayTools(toolsData);
+        });
+    </script>
+</body>
+</html>

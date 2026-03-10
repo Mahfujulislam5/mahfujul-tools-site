@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Library - Mahfujul Islam</title>
+    <style>
+        :root {
+            --primary-glow-color: rgba(0, 255, 255, 0.8);
+            --secondary-glow-color: rgba(0, 150, 255, 0.7);
+            --background-color: #02040a;
+            --card-background: rgba(10, 25, 47, 0.5);
+            --border-color: rgba(0, 255, 255, 0.2);
+            --text-color: #c9d1d9;
+            --header-color: #e6edf3;
+            --button-bg: rgba(0, 255, 255, 0.1);
+            --button-hover-bg: rgba(0, 255, 255, 0.2);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; transform: scale(0.98); }
+            50% { opacity: 0.7; transform: scale(1); }
+            100% { opacity: 0.4; transform: scale(0.98); }
+        }
+
+        @keyframes dataFlow {
+            0% { stroke-dashoffset: 1000; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .background-system {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        #processor-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50vw;
+            max-width: 600px;
+            height: auto;
+            transform: translate(-50%, -50%);
+            opacity: 0.4;
+            animation: pulse 10s infinite ease-in-out;
+            z-index: -3;
+        }
+        
+        #circuit-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        #circuit-lines .line {
+            stroke: var(--primary-glow-color);
+            stroke-width: 0.5;
+            stroke-dasharray: 1000;
+            animation: dataFlow 15s linear infinite;
+        }
+        
+        .cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--secondary-glow-color) 0%, rgba(0, 150, 255, 0) 50%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1000;
+            transition: opacity 0.2s;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .navbar .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--header-color);
+            text-decoration: none;
+        }
+
+        .navbar .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 1.1em;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar .nav-links a.active,
+        .navbar .nav-links a:hover {
+            color: var(--primary-glow-color);
+            text-shadow: 0 0 10px var(--primary-glow-color);
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .page-header h1 {
+            font-size: 3.5em;
+            color: var(--header-color);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .page-header p {
+            font-size: 1.2em;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Search and Filter */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+        
+        .search-bar {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 15px 20px;
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1em;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .search-bar input:focus {
+            border-color: var(--primary-glow-color);
+            box-shadow: 0 0 15px var(--primary-glow-color);
+        }
+        
+        .category-filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .category-filters button {
+            padding: 10px 20px;
+            background: var(--button-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .category-filters button.active,
+        .category-filters button:hover {
+            background: var(--button-hover-bg);
+            color: var(--primary-glow-color);
+            border-color: var(--primary-glow-color);
+            box-shadow: 0 0 10px var(--primary-glow-color);
+        }
+
+        /* Tools Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .tool-card {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-glow-color);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .tool-card .tool-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: var(--primary-glow-color);
+        }
+
+        .tool-card h3 {
+            font-size: 1.5em;
+            color: var(--header-color);
+            margin: 0 0 10px 0;
+        }
+        
+        .tool-card p {
+            font-size: 1em;
+            line-height: 1.5;
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+        
+        .tool-card .open-tool-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background: transparent;
+            border: 1px solid var(--primary-glow-color);
+            color: var(--primary-glow-color);
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card .open-tool-btn:hover {
+            background: var(--primary-glow-color);
+            color: var(--background-color);
+            box-shadow: 0 0 15px var(--primary-glow-color);
+        }
+
+        /* Mobile Design */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5em;
+            }
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .navbar .nav-links {
+                display: flex;
+                gap: 15px;
+            }
+            .navbar .nav-links a {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-glow"></div>
+
+    <div class="background-system">
+        <svg id="circuit-lines" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1920 1080">
+            <!-- Dynamic lines will be added here by JS -->
+        </svg>
+        <img id="processor-bg" src="https://i.imgur.com/2s44wGQ.png" alt="Processor Chip Background">
+    </div>
+
+    <div class="main-container">
+        <nav class="navbar">
+            <a href="#" class="logo">MAHFUJUL ISLAM</a>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#" class="active">Tool Library</a>
+                <a href="#">Projects</a>
+                <a href="#">Contact</a>
+            </div>
+        </nav>
+
+        <header class="page-header">
+            <h1>Tool Library</h1>
+            <p>Welcome to my digital laboratory. This is a collection of experimental tools I've built while exploring new technologies, APIs, and development techniques. Each tool represents a step in my journey of learning and discovery.</p>
+        </header>
+
+        <section class="controls">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search for tools...">
+            </div>
+            <div class="category-filters" id="categoryFilters">
+                 <!-- Category buttons will be generated here -->
+            </div>
+        </section>
+
+        <main class="tools-grid" id="toolsGrid">
+            <!-- Tool cards will be dynamically loaded here -->
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- CURSOR GLOW INTERACTION ---
+            const cursorGlow = document.querySelector('.cursor-glow');
+            document.addEventListener('mousemove', e => {
+                cursorGlow.style.left = `${e.clientX}px`;
+                cursorGlow.style.top = `${e.clientY}px`;
+            });
+
+            // --- BACKGROUND ANIMATION SYSTEM ---
+            const circuitLines = document.getElementById('circuit-lines');
+            const numLines = 20;
+            for (let i = 0; i < numLines; i++) {
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const startX = Math.random() * 1920;
+                const startY = Math.random() * 1080;
+                const endX = 960; // Center X
+                const endY = 540; // Center Y
+                const ctrl1X = Math.random() * 1920;
+                const ctrl1Y = Math.random() * 1080;
+                const ctrl2X = Math.random() * 1920;
+                const ctrl2Y = Math.random() * 1080;
+
+                path.setAttribute('d', `M${startX},${startY} C${ctrl1X},${ctrl1Y} ${ctrl2X},${ctrl2Y} ${endX},${endY}`);
+                path.setAttribute('fill', 'none');
+                path.classList.add('line');
+                path.style.animationDuration = `${Math.random() * 10 + 10}s`;
+                path.style.animationDelay = `${Math.random() * 5}s`;
+                circuitLines.appendChild(path);
+            }
+
+            // --- AUTO TOOL LOADING SYSTEM ---
+
+            // In a real application, this would be an external tools.json file.
+            // For this self-contained example, it's defined here.
+            const toolsData = [
+                {
+                    "icon": "🤖",
+                    "name": "AI Text Summarizer",
+                    "description": "An AI-powered tool to condense long articles or documents into concise summaries. Perfect for quick insights.",
+                    "url": "#",
+                    "category": "AI Tools"
+                },
+                {
+                    "icon": "🎨",
+                    "name": "Gradient Generator",
+                    "description": "Create beautiful, modern color gradients for your design projects. Includes CSS code generation.",
+                    "url": "#",
+                    "category": "Generators"
+                },
+                {
+                    "icon": "🛠️",
+                    "name": "JSON Formatter",
+                    "description": "A handy utility to validate, format, and beautify your JSON data, making it readable and easy to debug.",
+                    "url": "#",
+                    "category": "Developer Tools"
+                },
+                {
+                    "icon": "⚙️",
+                    "name": "Password Generator",
+                    "description": "Generate strong, secure, and random passwords with customizable length and character options.",
+                    "url": "#",
+                    "category": "Utilities"
+                },
+                 {
+                    "icon": "🧠",
+                    "name": "Code Explainer AI",
+                    "description": "Paste a snippet of code and get a simple, easy-to-understand explanation of what it does. Powered by AI.",
+                    "url": "#",
+                    "category": "AI Tools"
+                },
+                {
+                    "icon": "✨",
+                    "name": "SVG Shape Generator",
+                    "description": "Visually create unique SVG shapes like blobs and waves for your web backgrounds and assets.",
+                    "url": "#",
+                    "category": "Generators"
+                },
+                {
+                    "icon": "⏱️",
+                    "name": "Pomodoro Timer",
+                    "description": "A simple timer to help you focus using the Pomodoro Technique. Boost your productivity and manage your time.",
+                    "url": "#",
+                    "category": "Utilities"
+                },
+                {
+                    "icon": "↔️",
+                    "name": "Base64 Encoder/Decoder",
+                    "description": "Quickly encode your text or files into Base64 strings, or decode them back to their original form.",
+                    "url": "#",
+                    "category": "Developer Tools"
+                }
+            ];
+
+            const toolsGrid = document.getElementById('toolsGrid');
+            const searchInput = document.getElementById('searchInput');
+            const categoryFiltersContainer = document.getElementById('categoryFilters');
+            let activeCategory = 'All';
+
+            // --- CATEGORY FILTER GENERATION ---
+            function generateCategoryFilters() {
+                const categories = ['All', ...new Set(toolsData.map(tool => tool.category))];
+                categoryFiltersContainer.innerHTML = categories.map(category => 
+                    `<button class="${category === 'All' ? 'active' : ''}" data-category="${category}">${category}</button>`
+                ).join('');
+
+                document.querySelectorAll('.category-filters button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        document.querySelector('.category-filters button.active').classList.remove('active');
+                        button.classList.add('active');
+                        activeCategory = button.dataset.category;
+                        filterAndDisplayTools();
+                    });
+                });
+            }
+
+            // --- TOOL DISPLAY LOGIC ---
+            function displayTools(filteredTools) {
+                toolsGrid.innerHTML = '';
+                if (filteredTools.length === 0) {
+                    toolsGrid.innerHTML = `<p>No tools found.</p>`;
+                    return;
+                }
+                filteredTools.forEach(tool => {
+                    const card = document.createElement('div');
+                    card.className = 'tool-card';
+                    card.innerHTML = `
+                        <div class="tool-icon">${tool.icon}</div>
+                        <h3>${tool.name}</h3>
+                        <p>${tool.description}</p>
+                        <a href="${tool.url}" class="open-tool-btn">Open Tool</a>
+                    `;
+                    toolsGrid.appendChild(card);
+                });
+            }
+
+            // --- FILTERING AND SEARCH LOGIC ---
+            function filterAndDisplayTools() {
+                const searchTerm = searchInput.value.toLowerCase();
+                let filteredTools = toolsData;
+
+                // Filter by category
+                if (activeCategory !== 'All') {
+                    filteredTools = filteredTools.filter(tool => tool.category === activeCategory);
+                }
+
+                // Filter by search term
+                if (searchTerm) {
+                    filteredTools = filteredTools.filter(tool =>
+                        tool.name.toLowerCase().includes(searchTerm) ||
+                        tool.description.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                displayTools(filteredTools);
+            }
+
+            // --- EVENT LISTENERS ---
+            searchInput.addEventListener('keyup', filterAndDisplayTools);
+
+            // --- INITIAL LOAD ---
+            generateCategoryFilters();
+            displayTools(toolsData);
+        });
+    </script>
+</body>
+</html>
