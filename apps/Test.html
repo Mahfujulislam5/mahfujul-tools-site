@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Advanced Eid Poster Editor by Raju</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&family=Tiro+Bangla&family=Anek+Bangla:wght@400;700&family=Noto+Sans+Bengali:wght@400;700&family=Galada&family=Baloo+Da+2:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --dark-bg: #0a0a0a;
+            --cyan: #00ffff;
+            --glow-color: rgba(0, 255, 255, 0.7);
+            --text-light: #e0e0e0;
+            --text-dark: #333;
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .glass-blur {
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .app-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .controls {
+            flex: 1;
+            min-width: 320px;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        /* টাইপিং এনিমেশন এর জন্য সিএসএস */
+        .typing-animation {
+            font-size: 28px;
+            color: var(--cyan);
+            margin-top: 0;
+            text-shadow: 0 0 8px var(--glow-color);
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid var(--cyan);
+            animation: typing 3s steps(30, end) infinite alternate, blink-caret .5s step-end infinite;
+        }
+
+        @keyframes typing {
+            0% { width: 0; }
+            50% { width: 100%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--cyan) }
+        }
+
+        .control-group { margin-bottom: 20px; }
+        .control-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; color: #a0a0a0; }
+        
+        input[type="text"], input[type="file"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background-color: #1a1a1a;
+            color: var(--text-light);
+        }
+        input:focus, select:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 10px var(--glow-color); }
+        input[type="color"] { width: 100%; height: 40px; border: 1px solid #444; border-radius: 5px; cursor: pointer; padding: 2px; }
+
+        .frame-selection { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+        .frame-option { width: 100%; height: 80px; border: 3px solid transparent; border-radius: 8px; cursor: pointer; transition: all 0.3s; object-fit: contain; background-color: rgba(0,0,0,0.2); }
+        .frame-option.active { border-color: var(--cyan); box-shadow: 0 0 15px var(--glow-color); transform: scale(1.05); }
+
+        #download-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--cyan), #2dd4bf);
+            color: var(--dark-bg);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        #download-btn:hover { box-shadow: 0 0 20px var(--glow-color); transform: translateY(-2px); }
+
+        .poster-preview {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 320px;
+        }
+
+        #poster-container {
+            width: 500px;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+            background-color: #fff;
+            background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            border-radius: 10px;
+            touch-action: none; /* মোবাইল ব্রাউজারে পেজ জুম হওয়া বন্ধ করতে যুক্ত করা হয়েছে */
+        }
+
+        .resizable-draggable { position: absolute; box-sizing: border-box; user-select: none; }
+        .resizable-draggable.selected { outline: 2px dashed var(--cyan); }
+        .resizable-draggable:hover:not(.selected) { outline: 2px dotted rgba(0, 255, 255, 0.5); }
+        
+        #user-image-container {
+            top: 100px; left: 100px;
+            width: 300px; height: 300px;
+            cursor: move;
+            z-index: 1;
+        }
+        #user-image { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        
+        #frame-image {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .text-element { padding: 5px 10px; cursor: move; font-weight: bold; text-align: center; line-height: 1.2; }
+        #name-text { top: 400px; left: 150px; width: 200px; font-size: 30px; color: #FFFFFF; text-shadow: 2px 2px 4px #000; z-index: 12; }
+        #status-text { top: 50px; left: 100px; width: 300px; font-size: 35px; color: #333333; z-index: 11; font-family: 'Galada', cursive; }
+        
+        .watermark {
+            position: absolute;
+            bottom: 10px; right: 10px;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 5px;
+            z-index: 15;
+            color: #e0e0e0;
+            background-color: rgba(10, 10, 10, 0.7);
+            border: 1px solid rgba(0, 255, 255, 0.5);
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--glow-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="controls glass-blur">
+            <h1 class="typing-animation">মাহফুজুল ইসলাম</h1>
+            
+            <div class="control-group">
+                <label for="image-upload">আপনার ছবি:</label>
+                <input type="file" id="image-upload" accept="image/*">
+            </div>
+            
+            <div class="control-group">
+                <label for="name-input">আপনার নাম:</label>
+                <input type="text" id="name-input" placeholder="আপনার নাম এখানে লিখুন">
+            </div>
+
+            <div class="control-group">
+                <label for="status-select">শুভেচ্ছা বার্তা:</label>
+                <select id="status-select">
+                    <option value="ঈদ মোবারক">ঈদ মোবারক</option>
+                    <option value="Eid Mubarak">Eid Mubarak</option>
+                    <option value="ঈদের শুভেচ্ছা">ঈদের শুভেচ্ছা</option>
+                    <option value="সবাইকে ঈদের শুভেচ্ছা">সবাইকে ঈদের শুভেচ্ছা</option>
+                    <option value="তাকাব্বালাল্লাহু মিন্না ওয়া মিনকুম">তাকাব্বালাল্লাহু মিন্না ওয়া মিনকুম</option>
+                    <option value="[custom]">নিজের বার্তা লিখুন</option>
+                    <option value="">কোনো বার্তা নয়</option>
+                </select>
+                <input type="text" id="custom-status-input" placeholder="এখানে নিজের বার্তা লিখুন" style="display:none; margin-top: 10px;">
+            </div>
+
+            <div class="control-group">
+                <label for="font-select">ফন্ট স্টাইল:</label>
+                <select id="font-select">
+                    <option value="'Galada', cursive" style="font-family: 'Galada', cursive;">Galada (Sticker Style)</option>
+                    <option value="'Baloo Da 2', cursive" style="font-family: 'Baloo Da 2', cursive;">Baloo Da 2 (Rounded)</option>
+                    <option value="'Tiro Bangla', serif" style="font-family: 'Tiro Bangla', serif;">Tiro Bangla (Classic)</option>
+                    <option value="'Hind Siliguri', sans-serif" style="font-family: 'Hind Siliguri', sans-serif;">Hind Siliguri (Modern)</option>
+                    <option value="'Anek Bangla', sans-serif" style="font-family: 'Anek Bangla', sans-serif;">Anek Bangla (Bold)</option>
+                    <option value="'Noto Sans Bengali', sans-serif" style="font-family: 'Noto Sans Bengali', sans-serif;">Noto Sans (Clean)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="status-color-picker">শুভেচ্ছা বার্তার রঙ:</label>
+                <input type="color" id="status-color-picker" value="#333333">
+            </div>
+            <div class="control-group">
+                <label for="name-color-picker">নামের রঙ:</label>
+                <input type="color" id="name-color-picker" value="#FFFFFF">
+            </div>
+
+            <div class="control-group">
+                <label>একটি ফ্রেম বেছে নিন:</label>
+                <div class="frame-selection">
+                    <img class="frame-option active" data-frame="[আপনার_ফ্রেমের_BASE64_কোড_এখানে_বসাবেন]" src="">
+                </div>
+            </div>
+
+            <button id="download-btn">পোস্টার ডাউনলোড করুন</button>
+        </div>
+
+        <div class="poster-preview">
+            <div id="poster-container">
+                <img id="frame-image" src="[আপনার_ফ্রেমের_BASE64_কোড_এখানে_বসাবেন]">
+                
+                <div id="user-image-container" class="resizable-draggable">
+                    <img id="user-image" src="">
+                </div>
+                
+                <div id="status-text" class="text-element resizable-draggable">ঈদ মোবারক</div>
+                <div id="name-text" class="text-element resizable-draggable">আপনার নাম</div>
+                
+                <div class="watermark">Eid Editor by Raju</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const imageUpload = document.getElementById('image-upload');
+            const userImage = document.getElementById('user-image');
+            const nameInput = document.getElementById('name-input');
+            const nameText = document.getElementById('name-text');
+            const statusSelect = document.getElementById('status-select');
+            const customStatusInput = document.getElementById('custom-status-input');
+            const statusText = document.getElementById('status-text');
+            const fontSelect = document.getElementById('font-select');
+            const statusColorPicker = document.getElementById('status-color-picker');
+            const nameColorPicker = document.getElementById('name-color-picker');
+            const downloadBtn = document.getElementById('download-btn');
+            const posterContainer = document.getElementById('poster-container');
+            const frameOptions = document.querySelectorAll('.frame-option');
+            const frameImage = document.getElementById('frame-image');
+
+            // --- ১. ছবি আপলোড লজিক ---
+            imageUpload.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        userImage.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // --- ২. নাম ও শুভেচ্ছা পরিবর্তন ---
+            nameInput.addEventListener('input', function() {
+                nameText.innerText = this.value || 'আপনার নাম';
+            });
+
+            statusSelect.addEventListener('change', function() {
+                if (this.value === '[custom]') {
+                    customStatusInput.style.display = 'block';
+                    statusText.innerText = customStatusInput.value || 'আপনার বার্তা';
+                } else {
+                    customStatusInput.style.display = 'none';
+                    statusText.innerText = this.value || 'ঈদ মোবারক';
+                }
+            });
+
+            customStatusInput.addEventListener('input', function() {
+                statusText.innerText = this.value || 'আপনার বার্তা';
+            });
+
+            // --- ৩. ফন্ট এবং কালার লজিক ---
+            fontSelect.addEventListener('change', function() {
+                statusText.style.fontFamily = this.value;
+                nameText.style.fontFamily = this.value;
+            });
+
+            statusColorPicker.addEventListener('input', function() {
+                statusText.style.color = this.value;
+            });
+            nameColorPicker.addEventListener('input', function() {
+                nameText.style.color = this.value;
+            });
+
+            // --- ৪. ফ্রেম সিলেকশন ---
+            frameOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    frameOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    frameImage.src = this.getAttribute('data-frame');
+                });
+            });
+
+            // --- ৫. টেক্সট সরানো (Drag) লজিক ---
+            const textElements = document.querySelectorAll('.text-element');
+            textElements.forEach(elem => {
+                let isTextDragging = false;
+                let startX, startY, initLeft, initTop;
+
+                // Mouse Events
+                elem.addEventListener('mousedown', (e) => {
+                    isTextDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    initLeft = parseInt(window.getComputedStyle(elem).left, 10) || 0;
+                    initTop = parseInt(window.getComputedStyle(elem).top, 10) || 0;
+                    e.preventDefault();
+                });
+                document.addEventListener('mousemove', (e) => {
+                    if (isTextDragging) {
+                        elem.style.left = initLeft + (e.clientX - startX) + 'px';
+                        elem.style.top = initTop + (e.clientY - startY) + 'px';
+                    }
+                });
+                document.addEventListener('mouseup', () => isTextDragging = false);
+
+                // Touch Events
+                elem.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) {
+                        isTextDragging = true;
+                        startX = e.touches[0].clientX;
+                        startY = e.touches[0].clientY;
+                        initLeft = parseInt(window.getComputedStyle(elem).left, 10) || 0;
+                        initTop = parseInt(window.getComputedStyle(elem).top, 10) || 0;
+                        e.stopPropagation();
+                    }
+                }, {passive: false});
+                document.addEventListener('touchmove', (e) => {
+                    if (isTextDragging && e.touches.length === 1) {
+                        elem.style.left = initLeft + (e.touches[0].clientX - startX) + 'px';
+                        elem.style.top = initTop + (e.touches[0].clientY - startY) + 'px';
+                    }
+                }, {passive: false});
+                document.addEventListener('touchend', () => isTextDragging = false);
+            });
+
+            // --- ৬. মোবাইল টাচ ও জুম কন্ট্রোল (১ আঙুলে মুভ এবং ২ আঙুলে জুম) ---
+            const imgContainer = document.getElementById('user-image-container');
+            let isTouchDragging = false;
+            let initX, initY, startLeft, startTop;
+            let startDistance = 0;
+            let initialWidth, initialHeight;
+
+            // Mouse Events for Image
+            imgContainer.addEventListener('mousedown', (e) => {
+                isTouchDragging = true;
+                initX = e.clientX;
+                initY = e.clientY;
+                startLeft = parseInt(window.getComputedStyle(imgContainer).left, 10) || 0;
+                startTop = parseInt(window.getComputedStyle(imgContainer).top, 10) || 0;
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (isTouchDragging && e.buttons === 1) {
+                    imgContainer.style.left = startLeft + (e.clientX - initX) + 'px';
+                    imgContainer.style.top = startTop + (e.clientY - initY) + 'px';
+                }
+            });
+            document.addEventListener('mouseup', () => isTouchDragging = false);
+
+            // Touch Events for Image
+            imgContainer.addEventListener('touchstart', function(e) {
+                e.preventDefault(); // পুরো পেজ জুম বা স্ক্রল হওয়া বন্ধ করবে
+                if (e.touches.length === 1) {
+                    // ১ আঙুল দিয়ে পজিশন পরিবর্তন (Drag)
+                    isTouchDragging = true;
+                    initX = e.touches[0].clientX;
+                    initY = e.touches[0].clientY;
+                    startLeft = parseInt(window.getComputedStyle(imgContainer).left, 10) || 0;
+                    startTop = parseInt(window.getComputedStyle(imgContainer).top, 10) || 0;
+                } else if (e.touches.length === 2) {
+                    // ২ আঙুল দিয়ে জুম (Pinch Zoom)
+                    isTouchDragging = false;
+                    startDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    initialWidth = parseInt(window.getComputedStyle(imgContainer).width, 10);
+                    initialHeight = parseInt(window.getComputedStyle(imgContainer).height, 10);
+                }
+            }, { passive: false });
+
+            imgContainer.addEventListener('touchmove', function(e) {
+                e.preventDefault(); 
+                if (e.touches.length === 1 && isTouchDragging) {
+                    // ১ আঙুল দিয়ে সরানো হচ্ছে
+                    imgContainer.style.left = startLeft + (e.touches[0].clientX - initX) + 'px';
+                    imgContainer.style.top = startTop + (e.touches[0].clientY - initY) + 'px';
+                } else if (e.touches.length === 2) {
+                    // ২ আঙুল দিয়ে ছোট-বড় করা হচ্ছে
+                    const currentDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    const scale = currentDistance / startDistance;
+                    imgContainer.style.width = initialWidth * scale + 'px';
+                    imgContainer.style.height = initialHeight * scale + 'px';
+                }
+            }, { passive: false });
+
+            imgContainer.addEventListener('touchend', () => isTouchDragging = false);
+
+            // --- ৭. ডাউনলোড লজিক ---
+            downloadBtn.addEventListener('click', () => {
+                document.querySelectorAll('.resizable-draggable.selected').forEach(el => el.classList.remove('selected'));
+                
+                html2canvas(posterContainer, {
+                    useCORS: true,
+                    scale: 3,
+                    backgroundColor: null,
+                    logging: fa
